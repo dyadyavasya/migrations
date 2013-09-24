@@ -6,6 +6,11 @@
 * `DiffCommand` for migrations (if an Entity Manager is available)
 * Support for custom `ArgvInput` in CLI instance
 * Support for custom `ConsoleOutput` in CLI instance
+
+## Doctrine Migration Phar file
+
+You can dowload latest version of [doctrine-migrations.phar](https://doc-0c-3c-docs.googleusercontent.com/docs/securesc/tiqi05gtu3t655ve90buujisbdgm0omo/90055finec8ko1b5q4cdcgv11kgliedo/1380024000000/15995912864489919224/15995912864489919224/0B6YZFgbTNhv6dno0RlZkZThTSjQ?e=download&h=16653014193614665626&nonce=0kk8p7cj08iuo&user=15995912864489919224&hash=v0cfj2lgn41rcv8e588p6lb6chs547vu). 
+If you'll build your own `doctrine-migrations.phar` see instruction below.
  
 ## Installing Dependencies
 
