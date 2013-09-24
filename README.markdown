@@ -1,39 +1,23 @@
 # Doctrine Database Migrations
 
-## Eric Clemmons' Modifications
+## Features
 
-The latest official PHAR had path issues for me, so I made a couple of modifications and made
-packaging a bit easier, especially when creating a custom PHAR for your own apps.
-
-[Download `doctrine-migrations.phar` with custom Input/Output CLI support](http://github.com/downloads/ericclemmons/migrations/doctrine-migrations.phar)
-
-### Modifications
-
-* Added `DiffCommand` for migrations.
+* Single PHAR file for your projects
+* `DiffCommand` for migrations (if an Entity Manager is available)
 * Support for custom `ArgvInput` in CLI instance
 * Support for custom `ConsoleOutput` in CLI instance
+ 
+## Installing Dependencies
 
-In the same way that Doctrine will attempt to load the return values from `migrations-db.php` as your
-connection parameters, you can have `migrations-input.php` return:
+You can install deps using [Composer] (http://getcomposer.org/):
 
-    $input = new \Symfony\Component\Console\Input\ArgvInput;
-    ... make some changes ...
-    return $input;
+    $   php composer.phar install
 
-or have `migrations-output.php` return a customized `ConsoleOutput` with support for HTML tags in
-your SQL statements:
+## Building the PHAR
 
-    $output = new \Symfony\Component\Console\Output\ConsoleOutput;
-    $output->setStyle('p');
-    return $output;
+    $   php package.php
 
-This should give you the flexibility you need for customizing your input/output in the CLI.
-
-### Building Your Phar
-
-Simply run `php package.php`, which will create the file: `build/doctrine-migrations.phar` for you.
-Done! :)  This is a bit simpler than getting Phing/Ant going and running `phing build-migrations` and
-hoping the rest of the build dependencies work.
+It creates `./build/doctrine-migrations.phar`
 
 ### Creating archive disabled by INI setting
 
@@ -46,12 +30,60 @@ This can be fixed by setting the following in your php.ini:
     ; http://php.net/phar.readonly
     phar.readonly = Off
 
-### Installing Dependencies
 
-To install dependencies issue the following commands:
+## Configuration
 
-    git submodule init
-    git submodule update
+### migrations.yml
+
+Define how migrations will be stored and tracked within your database:
+
+    name: Doctrine Sandbox Migrations
+    migrations_namespace: DoctrineMigrations
+    table_name: doctrine_migration_versions
+    migrations_directory: /path/to/migrations/classes/DoctrineMigrations
+    
+By default Doctrine does not map the MySQL enum type to a Doctrine type. This is because Enums contain state (their allowed values) and Doctrine types don’t.
+You can register MySQL ENUMs to map to Doctrine strings. This way Doctrine always resolves ENUMs to Doctrine strings.
+
+    name: Doctrine Sandbox Migrations
+    migrations_namespace: DoctrineMigrations
+    table_name: doctrine_migration_versions
+    migrations_directory: /path/to/migrations/classes/DoctrineMigrations
+    mapping_types:
+        enum: string
+
+### migrations-db.php
+
+Define how to connect to your database:
+    
+    return array(
+        'driver'    => 'pdo_mysql',
+        'host'      => 'localhost',
+        'user'      => 'migrations',
+        'password'  => 'm1gr@t10n$',
+        'dbname'    => 'doctrine_sandbox'
+    );
+
+### migrations-input.php (Optional)
+
+Specify defaults or provide your own custom `ArgvInput`, should you so desire:
+
+    $input = new \Symfony\Component\Console\Input\ArgvInput;
+    ... make some changes ...
+    return $input;
+
+### migrations-output.php (Optional)
+
+If your database migrations contain HTML, you may run into issues with outputting the SQL to the console.
+This is because the `ConsoleOutput` class uses HTML-like tags for styling certain messages, such as `error`s,
+`info` messages, etc.
+
+For HTML to render properly, you can customize the `ConsoleOutput` within this file as follows:
+
+    $output = new \Symfony\Component\Console\Output\ConsoleOutput;
+    $output->setStyle('p'); // Adds default styling to the 'p' tag, as to not throw a rendering exception
+
+    return $output;
 
 ## Official Documentation
 
